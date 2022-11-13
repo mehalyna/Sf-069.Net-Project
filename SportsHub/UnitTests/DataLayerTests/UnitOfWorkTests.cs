@@ -4,7 +4,6 @@ using SportsHub.DAL.Data;
 using SportsHub.DAL.UOW;
 using SportsHub.Domain.Models;
 using SportsHub.Domain.UOW;
-using UnitTests.MockData;
 using Xunit;
 
 namespace UnitTests.DataLayerTests;

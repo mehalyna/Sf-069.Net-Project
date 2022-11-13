@@ -6,7 +6,6 @@ using SportsHub.AppService.Services;
 using SportsHub.Domain.Models;
 using SportsHub.Domain.Repository;
 using SportsHub.Domain.UOW;
-using UnitTests.MockData;
 using Xunit;
 
 namespace UnitTests.Services;

@@ -8,7 +8,6 @@ using SportsHub.Api.Controllers;
 using SportsHub.Api.Mapping.Models;
 using SportsHub.AppService.Services;
 using SportsHub.Domain.Models;
-using UnitTests.MockData;
 using Xunit;
 
 namespace UnitTests.Controllers

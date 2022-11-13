@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using SportsHub.DAL.Data;
 using SportsHub.DAL.Repository;
 using SportsHub.Domain.Models;
-using UnitTests.MockData;
 using Xunit;
 
 namespace UnitTests.DataLayerTests;
