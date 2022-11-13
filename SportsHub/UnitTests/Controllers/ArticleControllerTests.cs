@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Xunit2;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SportsHub.Api.Controllers;
@@ -15,25 +18,27 @@ namespace UnitTests.Controllers
         private readonly Mock<IArticleService> _articleService;
         private readonly ArticleController _articleController;
         private readonly IMapper _mapper;
+        private IFixture _fixture;
 
         public ArticleControllerTests()
         {
+            SetupFixture();
             if (_mapper == null)
             {
                 var mappingConfig = new MapperConfiguration(x => x.CreateMap<Article, ArticleResponseDTO>());
                 IMapper mapper = mappingConfig.CreateMapper();
                 _mapper = mapper;
             }
-            _articleService = new Mock<IArticleService>();
+            _articleService = _fixture.Freeze<Mock<IArticleService>>();
             _articleController = new ArticleController(_articleService.Object, _mapper);
         }
 
-        [Fact]
-        public async Task GetArticleByTitleAsync_ArticleWithProvidedTitleExists_ReturnsOkStatus()
+        [Theory]
+        [AutoData]
+        public async Task GetArticleByTitleAsync_ArticleWithProvidedTitleExists_ReturnsOkStatus(string title)
         {
             //Arrange
-            string title = "testArticle";
-            var article = ArticleMockData.GetArticle();
+            var article = _fixture.Build<Article>().With(x => x.Title, title).Create();
             _articleService.Setup(service => service.GetByTitleAsync(title)).ReturnsAsync(article);
 
             //Act
@@ -48,8 +53,7 @@ namespace UnitTests.Controllers
         public async Task GetArticleByTitleAsync_ArticleWithProvidedTitleDoesNotExist_ReturnsBadRequest()
         {
             //Arrange
-            string title = "randomTitle";
-            var article = ArticleMockData.GetArticle();
+            string title = _fixture.Create<string>();
             _articleService.Setup(service => service.GetByTitleAsync(title)).ReturnsAsync((Article?)null);
 
             //Act
@@ -63,7 +67,7 @@ namespace UnitTests.Controllers
         public async Task GetAllAsync_ArticlesExist_ReturnsOkStatus()
         {
             //Arrange
-            var articles = ArticleMockData.GetAll();
+            var articles = _fixture.Build<Article>().CreateMany(3);
             _articleService.Setup(service => service.GetAllAsync()).ReturnsAsync(articles);
 
             //Act
@@ -79,7 +83,7 @@ namespace UnitTests.Controllers
         public async Task GetAllAsync_ArticlesDontExist_ReturnsBadRequest()
         {
             //Arrange
-            var articles = ArticleMockData.GetNone();
+            var articles = new List<Article>();
             _articleService.Setup(service => service.GetAllAsync()).ReturnsAsync(articles);
 
             //Act
@@ -92,6 +96,14 @@ namespace UnitTests.Controllers
         private static T GetObjectResultContent<T>(ActionResult<T> result)
         {
             return (T)((ObjectResult)result.Result).Value;
+        }
+        
+        private void SetupFixture()
+        {
+            _fixture = new Fixture().Customize(new AutoMoqCustomization());
+            _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
+                .ForEach(b => _fixture.Behaviors.Remove(b));
+            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
     }
 }
