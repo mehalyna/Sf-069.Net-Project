@@ -18,7 +18,7 @@ public class AuthenticationServiceTests
     private readonly Mock<IPasswordHasher> _passwordHasher;
     private readonly IAuthenticationService _authentication;
     private IFixture _fixture;
-    private IPasswordCheckResult _checkResult;
+    private readonly IPasswordCheckResult _passwordCheckResult;
 
     public AuthenticationServiceTests()
     {
@@ -26,7 +26,7 @@ public class AuthenticationServiceTests
         _userService = _fixture.Freeze<Mock<IUserService>>();
         _passwordHasher = _fixture.Freeze<Mock<IPasswordHasher>>();
         _authentication = new AuthenticationService(_userService.Object, _passwordHasher.Object);
-        _checkResult = new PasswordCheckResult(true, false);
+        _passwordCheckResult = new PasswordCheckResult(true, false);
     }
 
     //Not Working !!!
@@ -38,7 +38,7 @@ public class AuthenticationServiceTests
         var givenUser = _fixture.Build<UserLoginDTO>().With(x=>x.UsernameOrEmail, userName).Create();
         var user = _fixture.Build<User>().With(x=>x.Email, userName).Create();
         _userService.Setup(service => service.GetByEmailOrUsernameAsync(userName)).ReturnsAsync(user);
-        _passwordHasher.Setup(x => x.Check(user.Password, givenUser.Password)).Returns(_checkResult);
+        _passwordHasher.Setup(x => x.Check(user.Password, givenUser.Password)).Returns(_passwordCheckResult);
         
         //Act
         var result = await _authentication.Authenticate(givenUser);
@@ -71,7 +71,7 @@ public class AuthenticationServiceTests
         var givenUser = _fixture.Build<UserLoginDTO>().With(x=>x.UsernameOrEmail, email).Create();
         var user = _fixture.Build<User>().With(x=>x.Email, email).Create();
         _userService.Setup(service => service.GetByEmailOrUsernameAsync(email)).ReturnsAsync(user);
-        _passwordHasher.Setup(x => x.Check(user.Password, givenUser.Password)).Returns(_checkResult);
+        _passwordHasher.Setup(x => x.Check(user.Password, givenUser.Password)).Returns(_passwordCheckResult);
     
         //Act
         var result = await _authentication.Authenticate(givenUser);
