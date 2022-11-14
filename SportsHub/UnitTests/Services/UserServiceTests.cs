@@ -2,8 +2,10 @@
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Moq;
+using SportsHub.Api.Exceptions.CustomExceptionModels;
 using SportsHub.AppService.Services;
 using SportsHub.Domain.Models;
+using SportsHub.Domain.Models.Constants;
 using SportsHub.Domain.Repository;
 using SportsHub.Domain.UOW;
 using Xunit;
@@ -50,10 +52,11 @@ public class UserServiceTests
         _repo.Setup(r => r.GetByEmailAsync(email)).ReturnsAsync((User?)null);
 
         //Act
-        var result = await _userService.GetByEmailAsync(email);
+         var ex =Assert.ThrowsAsync<NotFoundException>(() => _userService.GetByEmailAsync(email));
 
         //Assert
-        Assert.Null(result);
+        Assert.Equal(ex.Result.ErrorCode, StatusCodeConstants.NotFound);
+        Assert.Equal(ex.Result.Message, string.Format(ExceptionMessages.NotFound,ExceptionMessages.User));
     }
 
     [Theory]
@@ -77,12 +80,13 @@ public class UserServiceTests
     {
         //Arrange
         _repo.Setup(r => r.GetByUsernameAsync(userName)).ReturnsAsync((User?)null);
-
+    
         //Act
-        var result = await _userService.GetByUsernameAsync(userName);
+        var ex =Assert.ThrowsAsync<NotFoundException>(() => _userService.GetByUsernameAsync(userName));
 
         //Assert
-        Assert.Null(result);
+        Assert.Equal(ex.Result.ErrorCode, StatusCodeConstants.NotFound);
+        Assert.Equal(ex.Result.Message, string.Format(ExceptionMessages.NotFound,ExceptionMessages.User));
     }
 
     private void SetupFixture()
