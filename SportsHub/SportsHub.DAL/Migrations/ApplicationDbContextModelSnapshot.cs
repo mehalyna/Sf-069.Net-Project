@@ -45,6 +45,9 @@ namespace SportsHub.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<byte[]>("ArticlePicture")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -213,8 +216,8 @@ namespace SportsHub.DAL.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(75)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(75)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(75)");
 
                     b.Property<byte[]>("ProfilePicture")
                         .HasColumnType("varbinary(max)");
