@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SportsHub.Api.Mapping.Models;
 using SportsHub.Api.Validations;
 using SportsHub.AppService.Authentication.Models.DTOs;
 using SportsHub.AppService.Services;
@@ -31,7 +32,7 @@ namespace SportsHub.Api.Controllers
         }
 
         [HttpGet("GetByArticle")]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetByArticleAsync(int articleId)
+        public async Task<ActionResult<IEnumerable<CreateCommentRequest>>> GetByArticleAsync(int articleId)
         {
             var comments = await _commentService.GetByArticleAsync(articleId);
 
@@ -40,7 +41,9 @@ namespace SportsHub.Api.Controllers
                 return Ok(ValidationMessages.NoCommentsForArticle);
             }
 
-            return Ok(comments);
+            var commentsResponse = _mapper.Map<List<CreateCommentRequest>>(comments);
+
+            return Ok(commentsResponse);
         }
 
         [Authorize]
@@ -58,6 +61,24 @@ namespace SportsHub.Api.Controllers
             await _commentService.AddCommentAsync(commentInput);                       
 
             return Created(ValidationMessages.CommentAddedSuccessfully, commentInput);
+        }
+
+        [Authorize]
+        [HttpPost("LikeComment")]
+        public async Task<ActionResult> LikeCommentAsync(int commentId)
+        {
+            var result = await _commentService.LikeCommentAsync(commentId);
+
+            return Ok(ValidationMessages.CommentSuccessfullyLiked);
+        }
+
+        [Authorize]
+        [HttpPost("DislikeComment")]
+        public async Task<ActionResult> DislikeCommentAsync(int commentId)
+        {
+            var result = await _commentService.DislikeCommentAsync(commentId);
+
+            return Ok(ValidationMessages.CommentSuccessfullyDisliked);
         }
     }
 }
