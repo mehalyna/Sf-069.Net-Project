@@ -32,18 +32,35 @@ namespace SportsHub.Api.Controllers
         }
 
         [HttpGet("GetByArticle")]
-        public async Task<ActionResult<IEnumerable<CreateCommentRequest>>> GetByArticleAsync(int articleId)
+        public ActionResult<IEnumerable<Comment>> GetByArticle([FromQuery] CategoryParameters categoryParameters, int articleId)
         {
-            var comments = await _commentService.GetByArticleAsync(articleId);
+            var comments = _commentService.GetByArticle(articleId, categoryParameters);
 
-            if (!comments.Any())
-            {
-                return Ok(ValidationMessages.NoCommentsForArticle);
-            }
+            return Ok(comments);
+        }
 
-            var commentsResponse = _mapper.Map<List<CreateCommentRequest>>(comments);
+        [HttpGet("GetByArticleOrderByAsc")]
+        public ActionResult<IEnumerable<Comment>> GetByArticleOrderByAscending([FromQuery] CategoryParameters categoryParameters, int articleId)
+        {
+            var comments = _commentService.GetByArticleOrderByDate(articleId, categoryParameters);
 
-            return Ok(commentsResponse);
+            return Ok(comments);
+        }
+
+        [HttpGet("GetByArticleOrderByDesc")]
+        public ActionResult<IEnumerable<Comment>> GetByArticleOrderByDescending([FromQuery] CategoryParameters categoryParameters, int articleId)
+        {
+            var comments = _commentService.GetByArticleOrderByDateDescending(articleId, categoryParameters);
+
+            return Ok(comments);
+        }
+
+        [HttpGet("GetByArticleSortByLikes")]
+        public ActionResult<IEnumerable<Comment>> GetByArticleSortByLikes([FromQuery] CategoryParameters categoryParameters, int articleId)
+        {
+            var comments = _commentService.SortByLikes(articleId, categoryParameters);
+
+            return Ok(comments);
         }
 
         [Authorize]
@@ -58,7 +75,7 @@ namespace SportsHub.Api.Controllers
                 return ValidationProblem(response);
             }
 
-            await _commentService.AddCommentAsync(commentInput);                       
+            await _commentService.AddCommentAsync(commentInput);
 
             return Created(ValidationMessages.CommentAddedSuccessfully, commentInput);
         }

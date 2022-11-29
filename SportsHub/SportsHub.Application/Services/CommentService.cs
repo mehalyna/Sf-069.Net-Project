@@ -18,10 +18,28 @@ namespace SportsHub.AppService.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Comment>> GetByArticleAsync(int id)
+        public IEnumerable<Comment> GetByArticle(int id, CategoryParameters categoryParameters)
         {
-            return await _unitOfWork.CommentRepository.GetByArticleAsync(id) ??
+            return _unitOfWork.CommentRepository.GetByArticle(id, categoryParameters).ToList() ??
                    throw new NotFoundException(string.Format(ExceptionMessages.NotFound, ExceptionMessages.Comment));
+        }
+
+        public IEnumerable<Comment> GetByArticleOrderByDate(int id, CategoryParameters categoryParameters)
+        {
+            return _unitOfWork.CommentRepository.OrderByDate(id, categoryParameters).ToList() ??
+                   throw new NotFoundException(string.Format(ExceptionMessages.NotFound, ExceptionMessages.Comment));
+        }
+
+        public IEnumerable<Comment> GetByArticleOrderByDateDescending(int id, CategoryParameters categoryParameters)
+        {
+            return _unitOfWork.CommentRepository.OrderByDateDescending(id, categoryParameters).ToList() ??
+                   throw new NotFoundException(string.Format(ExceptionMessages.NotFound, ExceptionMessages.Comment));
+        }
+
+        public IEnumerable<Comment> SortByLikes(int id, CategoryParameters categoryParameters)
+        {
+            return _unitOfWork.CommentRepository.SortByLikes(id,categoryParameters).ToList() ??
+                throw new NotFoundException(string.Format(ExceptionMessages.NotFound, ExceptionMessages.Comment));
         }
 
         public async Task<bool> AddCommentAsync(CreateCommentDTO commentInput)
