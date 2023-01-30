@@ -11,6 +11,11 @@ namespace SportsHub.DAL.Repository
         {
         }
 
+        public async Task<User?> GetByIdAsync(int id)
+        {
+            return await FindByIdAsync(id);
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users
